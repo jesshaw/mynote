@@ -34,3 +34,27 @@
 #### Other:
 
 - Design patterns and design questions related to your projects.
+
+## 本地发布调整
+
+```
+gitbook serve
+```
+
+## 发布步骤
+
+main分支编译生成静态文件
+```
+gitbook build
+```
+
+切换到gh-pages分支，把生成的文件推送到github pages
+```
+checkout out gh-pages
+
+cp -r _book/* .
+git add .
+git commit -m "Publish book"
+```
+
+[参考gitbook集成文档](http://docs.flycloud.me/docs/gitbook/gitbook.com/config/github.html)
