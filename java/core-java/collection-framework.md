@@ -12,7 +12,40 @@
 
 方便转移到新的位置，即可能不变，也可能是老的长度+现在的位置。减少碰撞
 
-## 锁分段原理
+## 有集合A和集合B，现在需要将两个集合中重复的元素放入到集合C中，请问你会怎么编程实现
+
+这道题，简单想到的是循环遍历两个集合A和B，然后将重复的元素放入到集合C中，我们来看看怎么实现？
+
+```java
+List<String> list1 = Arrays.asList("a","b","c");
+List<String> list2 = Arrays.asList("a","b");
+List<String> list3 = new ArrayList<>();
+for (String a : list1) {
+    for (String b : list2) {
+        if(a.equals(b)){
+            list3.add(a);
+        }
+    }
+}
+System.out.println(list3);
+```
+
+时间复杂度为O(n²)。
+
+一个时间复杂度为O(n)的写法
+
+```java
+Set<String> set = new HashSet<>();
+for (String a : list1) {
+    set.add(a);
+}
+for (String b : list2) {
+    if(set.contains(b)){
+        list3.add(b);
+    }
+}
+System.out.println(list3);
+```
 
 ## 为什么使用红黑树，不用二叉树。  红黑树实现原理
 
