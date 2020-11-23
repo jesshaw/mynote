@@ -212,3 +212,209 @@ public @interface RestController {
 
     发现***默认加载了好多的自动配置类，这些自动配置类，会自动给我们加载每个场景所需的所有组件，并配置好这些组件，这样就省去了很多的配置***。
     ![picture 33](assets/eb74ef42c2f4bb4b34d5fec96bd6a444f1400356b0657007d0c35a5308b327ab.png)  
+
+## 什么是事务的传播特性及Spring支持的特性有哪些
+
+### 1 什么是事务的传播特性
+
+我们一般都是将事务的边界设置在Service层，
+
+那么当我们调用Service层的一个方法的时，它能够保证我们的这个方法中执行的所有的对数据库的更新操作保持在一个事务中，
+
+在事务层里面调用的这些方法要么全部成功，要么全部失败。那么事务的传播特性也是从这里说起的。
+
+如果你在你的Service层的这个方法中，还调用了本类的其他的Service方法，那么在调用其他的Service方法的时候，这个事务是怎么规定的呢？
+
+必须保证在我方法里调用的这个方法与我本身的方法处在同一个事务中，否则无法保证事物的一致性。
+
+事务的传播特性就是解决这个问题的
+
+### 2 Spring支持的事务传播特性
+
+在Spring中，针对传播特性的多种配置，我们大多数情况下只用其中的一种:PROPGATION_REQUIRED：
+
+这个配置项的意思是说当我调用service层的方法的时候，开启一个事务,
+
+那么在调用这个service层里面的其他的方法的时候,如果当前方法产生了事务就用当前方法产生的事务，否则就创建一个新的事务。
+
+这个工作是由Spring来帮助我们完成的。
+
+### 3 Spring支持的事务传播特性
+
+PROPAGATION_REQUIRED：支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。
+
+PROPAGATION_SUPPORTS：支持当前事务，如果当前没有事务，就以非事务方式执行。
+
+PROPAGATION_MANDATORY：支持当前事务，如果当前没有事务，就抛出异常。
+
+PROPAGATION_REQUIRES_NEW：新建事务，如果当前存在事务，把当前事务挂起
+
+PROPAGATION_NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。
+
+PROPAGATION_NEVER：以非事务方式执行，如果当前存在事务，则抛出异常。
+
+## SpringMVC有哪些常用的注解？有什么作用
+
+@RequestMapping：做请求的URL跟我们controller或者方法的映射关系
+
+@RequestParam：做请求参数的匹配，当请求参数名称跟我们方法的参数名不一致的时候，可以做匹配
+
+@GetMapping: 请求方式为GET
+
+@PostMapping:请求方式为POST
+
+@PathVariable:获取URL中携带的参数值，处理RESTful风格的路径参数
+
+@CookieValue：获取浏览器传递cookie值
+
+@RequestBody：接收请求中的参数信息，一般来说，接收一个集合或数组，或者以post方式提交的数据
+
+@ResponseBody: 改变返回逻辑视图的默认行为，返回具体的数据，比如json
+
+@Controller：Spring定义的，作用就是标明这是一个controller类
+
+@RestController：@Controller+@ResponseBody的组合
+
+## Spring+SpringMVC的父子容器关系
+
+SpringMVC+Spring这种开发模式的时候，会有两个容器
+
+• SpringMVC容器管理，controller，Handlermapping，ViewResolver
+
+• Spring容器管理，service，datasource，mapper，dao
+
+![picture 46](assets/722c8784fc62290586133e08eaa245b32967aeeb0bb054ca6bd696af22c35d09.png)  
+
+• Spring容器是父容器，SpringMVC容器是子容器
+
+• 子容器可以访问父容器上面的资源，所以我们会在看Controller可以注入Service
+
+## 谈谈SpringMVC的工作流程
+
+如图所示：
+
+![picture 47](assets/705dba24d70dff7e5642e35631b16c6f70d258550fda26231feaa82a4d6f0029.png)  
+
+1. 首先，将请求分给前端控制器DispatcherServlet
+
+2. DispatcherServlet查询HandlerMapping（映射控制器），从而找到处理请求的Controller（处理器）
+
+3. Controller执行业务逻辑处理后，返回一个ModelAndView（模型和视图）
+
+4. DispatcherServlet查询一个或多个ViewResolver（视图解析器），找到ModelAndView对应的视图对象，视图对象负责渲染返回给客户端
+
+## Spring的bean是线程安全的吗
+
+大家可以回顾下线程不安全构成的三要素：
+
+1 多线程环境
+
+2 访问同一个资源
+
+3 资源具有状态性
+
+那么Spring的bean模式是单例，而且后端的程序，天然就处于一个多线程的工作环境。
+
+那么是安全的吗？
+
+关键看第3点，我们的bean基本是无状态的，所以从这个点来说，是安全的。
+
+所谓无状态就是没有存储数据，即没有通过数据的状态来作为下一步操作的判断依据
+
+结论： ***不是线程安全的***
+
+Spring容器中的Bean是否线程安全，容器本身并没有提供Bean的线程安全策略，因此可以说Spring容器中的Bean本身不具备线程安全的特性，但是具体还是要结合具体scope的Bean去研究。
+
+## Spring 的 bean 作用域（scope）类型
+
+1 singleton:单例，默认作用域。
+
+2 prototype:原型，每次创建一个新对象。
+
+3 request:请求，每次Http请求创建一个新对象，适用于WebApplicationContext环境下。
+
+4 session:会话，同一个会话共享一个实例，不同会话使用不用的实例。
+
+5 global-session:全局会话，所有会话共享一个实例。
+
+## 谈谈你对Spring的认识
+
+这类问题，非常宽，来吧我们说说看
+
+1 概览图如下：
+
+![picture 48](assets/ab83c0bd1b42314b2f0e044894ea609e86a617bb785d102e5297e731a28de3da.png)  
+
+2 说说上面的模块
+
+核心的IOC容器技术（控制反转），帮助我们自动管理依赖的对象，不需要我们自己创建和管理依赖对象，从而实现了层与层之间的解耦，所以重点是解耦！
+
+核心的AOP技术（面向切面编程），方便我们将一些非核心业务逻辑抽离，从而实现核心业务和非核心业务的解耦，比如添加一个商品信息，那么核心业务就是做添加商品信息记录这个操作，非核心业务比如，事务的管理，日志，性能检测，读写分离的实现等等
+
+spring Dao，Spring web模块，更方便集成各大主流框架，比如ORM框架，hibernate，mybatis，比如MVC框架，struts2，SpringMVC
+
+## 如何实现动态代理
+
+SpringAOP（面向切面编程），AOP分离核心业务逻辑和非核心业务逻辑，其背后动态代理的思想，
+
+主要的实现手段有两种
+
+1 JDK的动态代理，是基于接口的实现。继承自Proxy类
+
+2 基于CGLIB的动态代理，是基于继承当前类的子类来实现的（所以，这个类不能是final）。我们项目结构是没有接口的情况下，如果实现动态代理，那么就需要使用这种方法。
+
+所以，我们的Spring默认会在以上两者根据代码的关系自动切换，当我们采用基于接口的方式编程时，则默认采用JDK的动态代理实现。如果不是接口的方式，那么会自动采用CGLIB。
+
+SpringAOP的背后实现原理就是动态代理机制。
+
+如何去验证这个结论：
+
+1. 搭建一个Spring项目
+
+2. 创建有接口的方式
+
+3. 创建无接口的方式
+
+4. 打印输出动态生成的代理对象（完整类名）
+
+```java
+@Autowire
+
+private IMiaoShaService miaoShaService;
+```
+
+比如，miaoshaService真正运行的时候就是一个代理对象
+
+## 谈谈对MVC的理解（重要）
+
+MVC是对Web层做了进一步的划分，更加细化
+
+- Model（模型） - 模型代表一个存取数据的对象或JAVA POJO。
+- View（视图） - 视图代表模型包含的数据的可视化，比如HTML，JSP，Thymeleaf，FreeMarker等等
+- Controller（控制器） - 控制器作用于模型和视图上。它控制数据流向模型对象，并在数据变化时更新视图。它使视图与模型分离开，目前的技术代表是Servlet，Controller
+
+常见的MVC框架有，Struts1，Struts2，SpringMVC。 比如，SpringMVC分为两个控制器
+
+***DispatchServlet：前端控制器***，由它来接收客户端的请求，再根据客户端请求的URL的特点，分发到对应的***业务控制器***，比如UserController
+
+## 谈谈三层架构
+
+### 1. JavaEE将企业级软件架构分为三个层次
+
+Web层：负责与用户交互并对外提供服务接口
+
+业务逻辑层：实现业务逻辑模块
+
+数据存取层：将业务逻辑层处理的结果持久化，方便后续查询
+
+### 2. 三层架构图
+
+![三层架构图](assets/cdf16be18a9f5924ef9c9e5414356b8dba2f4152acf3a6f5749a60c8581ed7f1.png)  
+
+### 3. 每个层都有各自的框架
+
+WEB层：SpringMVC，Struts2，Struts1
+
+业务逻辑层：Spring
+
+数据持久层：Hibernate，MyBatis，SpringDataJPA，SpringJDBC

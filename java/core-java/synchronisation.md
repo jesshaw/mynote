@@ -9,6 +9,79 @@
 
 [美团锁事](https://tech.meituan.com/2018/11/15/java-lock.html)
 
+## 什么是死锁？如何防止死锁
+
+### 1. 什么是死锁
+
+死锁最初由一个悲惨的故事说起，话说一群哲学家一起聚餐，然后在每个人的左边和右边分别放着一根筷子，而只有同时抓到两根筷子，才能正常吃饭，于是，不幸的故事发生了，每位哲学家都只抓到一根筷子，且都不愿意释放手中的筷子，于是，最终一桌的饭菜就这么浪费了。
+
+不知道这个故事是谁发明的，但确实形象说明了死锁的情况。
+
+转换到线程的场景，就是线程A持有独占锁资源a，并尝试去获取独占锁资源b
+
+同时，线程B持有独占锁资源b，并尝试去获取独占锁资源a
+
+这样线程A和线程B相互持有对方需要的锁，从而发生阻塞，最终变为死锁。
+
+```java
+public class Deadlock {
+    private static final Object a = new Object();
+    private static final Object b = new Object();
+    public static void main(String[] args){
+        new Thread(new Task(true)).start();
+        new Thread(new Task(false)).start();
+    }
+    static class Task implements Runnable{
+    private boolean flag;
+            public Task(boolean flag){
+        this.flag = flag;
+    }
+    @Override
+    public void run() {
+        if(flag){
+            synchronized (a){
+                System.out.println(Thread.currentThread().getName()+"->获取到a资源");
+                synchronized (b){
+                    System.out.println(Thread.currentThread().getName()+"->获取到b资源");
+                }
+            }
+        }else{
+            synchronized (b){
+                System.out.println(Thread.currentThread().getName()+"->获取到b资源");
+                synchronized (a){
+                    System.out.println(Thread.currentThread().getName()+"->获取到a资源");
+                }
+            }
+        }
+    }
+}
+
+//有可能会出现死锁，如果第一个线程已经走完，第二个线程才获取到执行权限，那么就不会出现死锁
+
+```
+
+### 2. 如何防止死锁？（重点）
+
+减少同步代码块嵌套操作
+
+降低锁的使用粒度，不要几个功能共用一把锁
+
+尽量采用tryLock（timeout）的方法，可以设置超时时间，这样超时之后，就可以主动退出，防止死锁（关键）
+
+## 什么是悲观锁，什么是乐观锁
+
+1. 悲观锁是利用数据库本身的锁机制来实现，会锁记录。
+    > 实现的方式为：select * from t_table where id = 1 for update
+
+2. 乐观锁是一种不锁记录的实现方式，采用CAS模式，采用version字段来作为判断依据。
+
+    > 每次对数据的更新操作，都会对version+1，这样提交更新操作时，如果version的值已被更改，则更新失败。
+
+3. 乐观锁的实现为什么要选择version字段，如果选择其他字段，比如业务字段store（库存），那么可能会出现所谓的ABA问题。
+
+    如下图所示：
+    ![picture 45](assets/67387cbc910ca30ee212147fd774918309e569062420f5228ad52500ee543741.png)  
+
 ## 说说synchronized的底层原理
 
 synchronized是由一对monitorenter和monitorexit指令来实现同步的，在JDK6之前，monitor的实现是依靠操作系统内部的互斥锁来实现的，所以需要进行用户态和内核态的切换，所以此时的同步操作是一个重量级的操作，性能很低。
@@ -90,5 +163,17 @@ javap -verbose Test.class
 5. 锁绑定多个条件Condition
     - synchronized没有
     - ReentrantLock用来实现分组唤醒的线程们，可以精确唤醒，而不是synchronized要么随机唤醒一个线程要么唤醒全部线程
+
+## synchronized和volatile的区别
+
+1. 作用的位置不同
+
+    synchronized是修饰方法，代码块； volatile是修饰变量
+
+2. 作用不同
+
+    synchronized，可以保证变量修改的可见性及原子性，可能会造成线程的阻塞
+
+    volatile仅能实现变量修改的可见性，但无法保证原子性，不会造成线程的阻塞
 
 ## 锁分段原理
