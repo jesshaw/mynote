@@ -1,0 +1,57 @@
+{
+    "plugins": [
+        "expandable-chapters-small",
+        "splitter",
+        "anchor-navigation-ex",
+        "comments-footer",
+
+        "copy-code-button",
+
+        "page-copyright",
+
+        "-lunr",
+        "-search",
+        "search-pro",
+
+        "versions-select",
+
+        "graphviz-and-plant-uml"
+    ],
+    "pluginsConfig": {
+        "anchor-navigation-ex": {
+            "showLevel": true
+        },
+        "comments-footer": {
+            "type": "github",
+            "repo": "jesshaw/mynote",
+            "copyright": "Copyright © jes"
+        },
+
+        "page-copyright": {
+            "description": "modified at",
+            "signature": "jes.shaw",
+            "wisdom": "Designer, Frontend Developer & overall web enthusiast",
+            "format": "YYYY-MM-dd hh:mm:ss",
+            "copyright": "Copyright &#169; jes.shaw",
+            "timeColor": "#666",
+            "copyrightColor": "#666",
+            "utcOffset": "8",
+            "style": "normal",
+            "noPowered": false
+        },
+
+        "versions": {
+            "options": [
+                {
+                    "value": "http://blog.lexiangmiao.com/mynote",
+                    "text": "v1.0.1"
+                }
+            ]
+        },
+
+        "graphviz-and-plant-uml": {
+            "Render": "PlantUMLServer",
+            "Server": "http://www.plantuml.com/plantuml"
+        }
+    }
+}
